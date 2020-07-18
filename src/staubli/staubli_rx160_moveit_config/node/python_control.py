@@ -43,18 +43,24 @@ display_trajectory_publisher=rospy.Publisher('/move_group/display_planned_path',
 # # Sometimes for debugging it is useful to print the entire state of the
 # # robot:
 # print "============ Printing robot state"
-# print robot.get_current_state()
+print(robot.get_current_state())
 # print ""
 
 # move robot to non singular position by adjusting joint vlaues in group
 joint_goal = group.get_current_joint_values()
-joint_goal[0] = -pi/2
-joint_goal[1] = pi/4
-joint_goal[2] = 0
-joint_goal[3] = pi/4
+print(joint_goal)
+joint_goal[0] = 0
+joint_goal[1] = 0
+joint_goal[2] =  -1
+joint_goal[3] =  1
 
-#use go command to execute the joint angles
+# #use go command to execute the joint angles
 group.go(joint_goal,wait=True)
 
-# call stop to avoid residual movements
+# # call stop to avoid residual movements
 group.stop()
+
+import numpy as np
+jac = group.get_jacobian_matrix(joint_goal)
+value = np.linalg.det(jac)
+print(value)

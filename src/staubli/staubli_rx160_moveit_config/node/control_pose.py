@@ -37,34 +37,50 @@ display_trajectory_publisher=rospy.Publisher('/move_group/display_planned_path',
 
 
 # We can get the name of the reference frame for this robot:
-planning_frame = group.get_planning_frame()
-print "============ Reference frame: %s" % planning_frame
+# planning_frame = group.get_planning_frame()
+# print "============ Reference frame: %s" % planning_frame
 
-# We can also print the name of the end-effector link for this group:
+# # We can also print the name of the end-effector link for this group:
 eef_link = group.get_end_effector_link()
-print "============ End effector: %s" % eef_link
+# print "============ End effector: %s" % eef_link
 
-# We can get a list of all the groups in the robot:
-group_names = robot.get_group_names()
-print "============ Robot Groups:", robot.get_group_names()
+# # We can get a list of all the groups in the robot:
+# group_names = robot.get_group_names()
+# print "============ Robot Groups:", robot.get_group_names()
 
-# Sometimes for debugging it is useful to print the entire state of the
-# robot:
-print "============ Printing robot state"
-print robot.get_current_state()
-print ""
-# get robot to initial position
-group.go([pi/4,pi/4,pi/4,pi/4],wait=True)
-group.stop()
+# # Sometimes for debugging it is useful to print the entire state of the
+# # robot:
+# print "============ Printing robot state"
+# print robot.get_current_state()
+# print ""
+# # get robot to initial position
+# #group.go([0,0,0,0],wait=True)
+# #group.stop()
 # move robot to non singular position by adjusting joint vlaues in group
 joint_goal = group.get_current_joint_values()
-joint_goal[0] = -pi/4
-joint_goal[1] = -pi/4
-joint_goal[2] =  0
-joint_goal[3] =  pi/4
+# joint_goal[0] = 0
+# joint_goal[1] = 0
+# joint_goal[2] =  0
+# joint_goal[3] =  0
 
-#use go command to execute the joint angles
+# #use go command to execute the joint angles
+# group.go(joint_goal,wait=True)
+# group.stop()
+print("joint_angles")
+print(joint_goal)
+pose = group.get_current_pose(eef_link).pose
+x = pose.position.x
+y = pose.position.y
+z = pose.position.z
+print(x,y,z)
+
+joint_goal[0] = 0
+joint_goal[1] = 0
+joint_goal[2] =  -1
+joint_goal[3] =  1
+
 group.go(joint_goal,wait=True)
+group.stop()
 
 # get pose
 pose = group.get_current_pose(eef_link).pose
@@ -75,50 +91,50 @@ z = pose.position.z
 print(x,y,z)
 group.stop()
 
-# Inverse Kinematics Solution
+# # Inverse Kinematics Solution
 
-import tinyik
-import numpy as np
+# import tinyik
+# import numpy as np
 
-from tinyik import (
-    Link, Joint,
-    FKSolver, IKSolver,
-    NewtonOptimizer,
-    SteepestDescentOptimizer,
-    ConjugateGradientOptimizer,
-    ScipyOptimizer, ScipySmoothOptimizer
-)
-
-
-
-theta = np.pi / 6
-
-
-def build_ik_solver(optimizer_instance):
-    fk = FKSolver([Joint('z'), Link([0, 0., 0.001]), Joint('x'), Link([0, 0., 0.093]), Joint('x'), Link([0, 0., 0.121]), Joint('x'), Link([0, 0., 0.112])])
-    return IKSolver(fk, optimizer_instance)
+# from tinyik import (
+#     Link, Joint,
+#     FKSolver, IKSolver,
+#     NewtonOptimizer,
+#     SteepestDescentOptimizer,
+#     ConjugateGradientOptimizer,
+#     ScipyOptimizer, ScipySmoothOptimizer
+# )
 
 
 
-ik = build_ik_solver(ConjugateGradientOptimizer())
-pos_Conj_grad = ik.solve([pi/4,pi/4,pi/4,pi/4], [x,y,z])
-print("")
-print(pos_Conj_grad)
+# theta = np.pi / 6
 
-# apply on robot again
-#use go command to execute the joint angles
-# get robot to initial position
-group.go([pi/2,pi/4,pi/4,pi/2],wait=True)
-group.stop()
 
-group.go(pos_Conj_grad,wait=True)
-group.stop()
-# get pose
-pose = group.get_current_pose(eef_link).pose
-x_e = pose.position.x
-y_e = pose.position.y
-z_e = pose.position.z
+# def build_ik_solver(optimizer_instance):
+#     fk = FKSolver([Joint('z'), Link([0, 0., 0.001]), Joint('x'), Link([0, 0., 0.093]), Joint('x'), Link([0, 0., 0.121]), Joint('x'), Link([0, 0., 0.112])])
+#     return IKSolver(fk, optimizer_instance)
 
-print(x_e,y_e,z_e)
-group.stop()
+
+
+# ik = build_ik_solver(ConjugateGradientOptimizer())
+# pos_Conj_grad = ik.solve([pi/4,pi/4,pi/4,pi/4], [x,y,z])
+# print("")
+# print(pos_Conj_grad)
+
+# # apply on robot again
+# #use go command to execute the joint angles
+# # get robot to initial position
+# group.go([pi/2,pi/4,pi/4,pi/2],wait=True)
+# group.stop()
+
+# group.go(pos_Conj_grad,wait=True)
+# group.stop()
+# # get pose
+# pose = group.get_current_pose(eef_link).pose
+# x_e = pose.position.x
+# y_e = pose.position.y
+# z_e = pose.position.z
+
+# print(x_e,y_e,z_e)
+# group.stop()
 
