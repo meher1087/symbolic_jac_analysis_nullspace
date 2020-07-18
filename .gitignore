@@ -1,0 +1,6 @@
+/build
+/devel
+/src/.vscode
+/.catkin_workspace
+/src/staubli/staubli_rx160_moveit_plugins
+/src/CMakeLists.txt
